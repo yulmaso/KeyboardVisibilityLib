@@ -1,7 +1,7 @@
 # KeyboardVisibilityLib
 [![](https://jitpack.io/v/yulmaso/KeyboardVisibilityLib.svg)](https://jitpack.io/#yulmaso/KeyboardVisibilityLib)
 
-Small keyboard visibility listener library for Android. Requires API >= 21. Doesn't work with windowSoftInputMode="adjustNothing". 
+Small keyboard visibility listener library for Android. Doesn't work with windowSoftInputMode="adjustNothing".
 
 - Simple in use with extension functions of Activity and Fragment
 - Automatically removes listener when its parent Activity or Fragment is destroyed.
@@ -51,5 +51,5 @@ val keyboardListener = setKeyboardVisibilityListener(viewLifecycleOwner) { visib
 }
 
 // Remove the listener when you don't need it anymore
-keyboardListener.removeKeyboardListener()
+keyboardListener.remove()
 ```
