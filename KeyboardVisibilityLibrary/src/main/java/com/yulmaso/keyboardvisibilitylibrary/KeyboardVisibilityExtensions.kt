@@ -22,15 +22,15 @@ import androidx.lifecycle.OnLifecycleEvent
 fun Fragment.setKeyboardVisibilityListener(
     lifecycleOwner: LifecycleOwner,
     onVisibilityChanged: (visible: Boolean) -> Unit
-) {
-    requireActivity().setKeyboardVisibilityListener(lifecycleOwner.lifecycle, onVisibilityChanged)
+): KeyboardListener {
+    return requireActivity().setKeyboardVisibilityListener(lifecycleOwner.lifecycle, onVisibilityChanged)
 }
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 fun Activity.setKeyboardVisibilityListener(
     lifecycle: Lifecycle,
     onVisibilityChanged: (visible: Boolean) -> Unit
-) {
+): KeyboardListener {
     val parentView: View = (findViewById<View>(android.R.id.content) as ViewGroup).getChildAt(0)
     val onGlobalLayoutListener = object : ViewTreeObserver.OnGlobalLayoutListener {
         private var alreadyOpen = false
@@ -54,13 +54,15 @@ fun Activity.setKeyboardVisibilityListener(
             onVisibilityChanged(isShown)
         }
     }
-    parentView.viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
-
-    lifecycle.addObserver(object: LifecycleObserver {
+    val lifecycleObserver =  object: LifecycleObserver {
         @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         fun onDestroy() {
             lifecycle.removeObserver(this)
             parentView.viewTreeObserver.removeOnGlobalLayoutListener(onGlobalLayoutListener)
         }
-    })
+    }
+
+    parentView.viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
+    lifecycle.addObserver(lifecycleObserver)
+    return KeyboardListener(lifecycle, parentView, lifecycleObserver, onGlobalLayoutListener)
 }
