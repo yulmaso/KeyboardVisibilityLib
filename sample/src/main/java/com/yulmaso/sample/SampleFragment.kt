@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -43,22 +44,26 @@ class SampleFragment: Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val et = view.findViewById<EditText>(R.id.fragment_et)
-        val btn = view.findViewById<Button>(R.id.to_activity_btn)
-
         (requireActivity() as AppCompatActivity).supportActionBar?.title =
             getString(R.string.fragment_title)
 
-        btn.setOnClickListener {
+        val et = view.findViewById<EditText>(R.id.et)
+        val tv = view.findViewById<TextView>(R.id.tv)
+
+        val keyboardListener = setKeyboardVisibilityListener(viewLifecycleOwner) { visible ->
+            if (visible) tv.setText(R.string.visible_msg)
+            else {
+                tv.setText(R.string.invisible_msg)
+                et.clearFocus()
+            }
+        }
+
+        view.findViewById<Button>(R.id.to_activity_btn).setOnClickListener {
             removeFromContainer(requireFragmentManager())
         }
 
-        setKeyboardVisibilityListener(viewLifecycleOwner) { visible ->
-            if (visible) et.setHint(R.string.visible_hint)
-            else {
-                et.setHint(R.string.invisible_hint)
-                et.clearFocus()
-            }
+        view.findViewById<Button>(R.id.remove_btn).setOnClickListener {
+            keyboardListener.remove()
         }
     }
 

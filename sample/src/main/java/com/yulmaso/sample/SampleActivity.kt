@@ -3,6 +3,7 @@ package com.yulmaso.sample
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.yulmaso.keyboardvisibilitylibrary.setKeyboardVisibilityListener
 
@@ -12,18 +13,23 @@ class SampleActivity : AppCompatActivity() {
         setContentView(R.layout.activity_sample)
         setActivityTitle()
 
+        val et = findViewById<EditText>(R.id.et)
+        val tv = findViewById<TextView>(R.id.tv)
+
+        val keyboardListener = setKeyboardVisibilityListener(lifecycle) { visible ->
+            if (visible) tv.setText(R.string.visible_msg)
+            else {
+                tv.setText(R.string.invisible_msg)
+                et.clearFocus()
+            }
+        }
+
         findViewById<Button>(R.id.to_fragment_btn).setOnClickListener {
             SampleFragment.addToContainer(supportFragmentManager, android.R.id.content)
         }
 
-        val et = findViewById<EditText>(R.id.activity_et)
-
-        setKeyboardVisibilityListener(lifecycle) { visible ->
-            if (visible) et.setHint(R.string.visible_hint)
-            else {
-                et.setHint(R.string.invisible_hint)
-                et.clearFocus()
-            }
+        findViewById<Button>(R.id.remove_btn).setOnClickListener {
+            keyboardListener.remove()
         }
     }
 

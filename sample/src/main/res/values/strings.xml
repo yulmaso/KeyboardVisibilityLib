@@ -4,8 +4,13 @@
     <string name="activity_title">Activity</string>
     <string name="fragment_title">Fragment</string>
 
-    <string name="invisible_hint">Keyboard is invisible</string>
-    <string name="visible_hint">Keyboard is visible</string>
+    <string name="invisible_msg">Keyboard is invisible</string>
+    <string name="visible_msg">Keyboard is visible</string>
+
+    <string name="et_hint">Click here to show keyboard</string>
+
+    <string name="remove_btn">Remove listener</string>
+    <string name="add_btn">Add listener</string>
 
     <string name="go_to_fragment_btn">Go to fragment</string>
     <string name="return_to_activity_btn">Return to activity</string>

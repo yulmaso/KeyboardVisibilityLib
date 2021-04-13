@@ -7,7 +7,6 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -18,7 +17,10 @@ import androidx.lifecycle.OnLifecycleEvent
  *  Created by yulmaso
  *  Date: 13.04.21
  */
-@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+interface KeyboardListener {
+    fun remove()
+}
+
 fun Fragment.setKeyboardVisibilityListener(
     lifecycleOwner: LifecycleOwner,
     onVisibilityChanged: (visible: Boolean) -> Unit
@@ -26,13 +28,13 @@ fun Fragment.setKeyboardVisibilityListener(
     return requireActivity().setKeyboardVisibilityListener(lifecycleOwner.lifecycle, onVisibilityChanged)
 }
 
-@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 fun Activity.setKeyboardVisibilityListener(
     lifecycle: Lifecycle,
     onVisibilityChanged: (visible: Boolean) -> Unit
 ): KeyboardListener {
-    val parentView: View = (findViewById<View>(android.R.id.content) as ViewGroup).getChildAt(0)
-    val onGlobalLayoutListener = object : ViewTreeObserver.OnGlobalLayoutListener {
+    val mParentView: View = (findViewById<View>(android.R.id.content) as ViewGroup).getChildAt(0)
+
+    val mOnGlobalLayoutListener = object : ViewTreeObserver.OnGlobalLayoutListener {
         private var alreadyOpen = false
         private val defaultKeyboardHeightDP = 100
         private val EstimatedKeyboardDP = defaultKeyboardHeightDP +
@@ -42,27 +44,41 @@ fun Activity.setKeyboardVisibilityListener(
             val estimatedKeyboardHeight = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 EstimatedKeyboardDP.toFloat(),
-                parentView.resources.displayMetrics
+                mParentView.resources.displayMetrics
             ).toInt()
-            parentView.getWindowVisibleDisplayFrame(rect)
-            val heightDiff: Int = parentView.rootView.height - (rect.bottom - rect.top)
+            mParentView.getWindowVisibleDisplayFrame(rect)
+            val heightDiff: Int = mParentView.rootView.height - (rect.bottom - rect.top)
             val isShown = heightDiff >= estimatedKeyboardHeight
             if (isShown == alreadyOpen) {
                 return
             }
             alreadyOpen = isShown
-            onVisibilityChanged(isShown)
-        }
-    }
-    val lifecycleObserver =  object: LifecycleObserver {
-        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        fun onDestroy() {
-            lifecycle.removeObserver(this)
-            parentView.viewTreeObserver.removeOnGlobalLayoutListener(onGlobalLayoutListener)
+            onVisibilityChanged.invoke(isShown)
         }
     }
 
-    parentView.viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
-    lifecycle.addObserver(lifecycleObserver)
-    return KeyboardListener(lifecycle, parentView, lifecycleObserver, onGlobalLayoutListener)
+    lateinit var mLifecycleObserver : LifecycleObserver
+
+    val mKeyboardListener = object: KeyboardListener {
+        override fun remove() {
+            lifecycle.removeObserver(mLifecycleObserver)
+            @Suppress("DEPRECATION")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+                mParentView.viewTreeObserver.removeOnGlobalLayoutListener(mOnGlobalLayoutListener)
+            else
+                mParentView.viewTreeObserver.removeGlobalOnLayoutListener(mOnGlobalLayoutListener)
+        }
+    }
+
+    mLifecycleObserver =  object: LifecycleObserver {
+        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        fun onDestroy() {
+            mKeyboardListener.remove()
+        }
+    }
+
+    mParentView.viewTreeObserver.addOnGlobalLayoutListener(mOnGlobalLayoutListener)
+    lifecycle.addObserver(mLifecycleObserver)
+
+    return mKeyboardListener
 }
