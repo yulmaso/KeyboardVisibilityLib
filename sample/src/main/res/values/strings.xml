@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Sample</string>
+
+    <string name="activity_title">Activity</string>
+    <string name="fragment_title">Fragment</string>
+
+    <string name="invisible_hint">Keyboard is invisible</string>
+    <string name="visible_hint">Keyboard is visible</string>
+
+    <string name="go_to_fragment_btn">Go to fragment</string>
+    <string name="return_to_activity_btn">Return to activity</string>
+</resources>
