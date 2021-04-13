@@ -1,10 +1,8 @@
 package com.yulmaso.sample
 
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.yulmaso.keyboardvisibilitylibrary.setKeyboardVisibilityListener
 
