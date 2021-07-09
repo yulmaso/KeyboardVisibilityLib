@@ -22,7 +22,7 @@ allprojects {
 Step 2. Add the dependency
 ```groovy
 dependencies {
-    implementation 'com.github.yulmaso:KeyboardVisibilityLib:Tag'
+    implementation 'com.github.yulmaso:KeyboardVisibilityLib:2.0.0'
 }
 ```
 
